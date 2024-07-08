@@ -23,8 +23,8 @@ const createPaymentIntent = async (req, res) => {
       items,
       name,
       orderType,
-      tableNo,
-      selectedAddress,
+      tableNo: tableNo || 0,
+      selectedAddress : selectedAddress || ' ',
       orderStatus,
       status: 'created', // Initial status
       paymentIntentId: paymentIntent.id, // Store payment intent ID
