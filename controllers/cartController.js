@@ -4,7 +4,6 @@ exports.getCart = async (req, res) => {
   try {
     //   const userId = req.params.userId || "1";
     const { userId } = req.params;
-    console.log(userId);
     const cart = await CartItem.find({ userId });
     if (!cart) {
       return res.status(404).json({ message: "Cart not found" });
@@ -29,7 +28,6 @@ exports.addToCart = async (req, res) => {
 exports.removeCartItem = async (req, res) => {
   const { userId,name } = req.params;
   // const { name } = req.body;
-  console.log(userId,name);
   try {
     const cartItem = await CartItem.findOneAndDelete(
       { userId: userId, "dish.name": name }
@@ -61,7 +59,6 @@ exports.removeCartItem = async (req, res) => {
 // };
 exports.clearCartItem = async (req, res) => {
   const { userId } = req.params;
-  console.log(userId);
   
   try {
     // Assuming CartItem schema has a userId field
