@@ -44,6 +44,39 @@ exports.removeCartItem = async (req, res) => {
     res.status(500).json({ message: "Error removing cart item", error });
   }
 };
+// exports.clearCartItem = async (req, res) => {
+//   const { userId } = req.params;
+//   console.log(userId);
+//   try {
+//     const cartItem = await CartItem.findByIdAndDelete( userId );
+
+//     if (!cartItem) {
+//       return res.status(404).json({ message: "Cart item not found" });
+//     }
+
+//     res.status(200).json({ message: "Cart items removed successfully" });
+//   } catch (error) {
+//     res.status(500).json({ message: "Error removing cart item", error });
+//   }
+// };
+exports.clearCartItem = async (req, res) => {
+  const { userId } = req.params;
+  console.log(userId);
+  
+  try {
+    // Assuming CartItem schema has a userId field
+    const result = await CartItem.deleteMany({ userId });
+
+    if (result.deletedCount === 0) {
+      return res.status(404).json({ message: "Cart items not found" });
+    }
+
+    res.status(200).json({ message: "Cart items removed successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Error removing cart items", error });
+  }
+};
+
 
 exports.incrementCartItem = async (req, res) => {
   const { name } = req.body;

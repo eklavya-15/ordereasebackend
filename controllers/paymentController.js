@@ -1,64 +1,47 @@
-require('dotenv').config();
-const Razorpay = require('razorpay');
-const crypto = require('crypto');
+require("dotenv").config();
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const Order = require('../models/Order');
 
-const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID,
-  key_secret: process.env.RAZORPAY_KEY_SECRET,
-});
-
-exports.createOrder = async (req, res) => {
-  const { amount, currency, receipt, userId, userEmail, food } = req.body;
+const createPaymentIntent = async (req, res) => {
+  const { amount, currency, userId, userEmail, food,items,name,orderType,tableNo,selectedAddress,orderStatus } = req.body;
+  console.log(req.body);
 
   try {
-    const options = {
-      amount: amount, 
-      currency: currency,
-      receipt: receipt,
-    };
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount,
+      currency,
+      receipt_email: userEmail,
+      metadata: { userId },
+    });
 
-    const order = await razorpay.orders.create(options);
-    console.log(order);
-
+    // Create a new order in the database
     const newOrder = new Order({
       userId,
       userEmail,
-      amount,
       food,
-      orderId: order.id,
-      status: 'pending',
+      amount,
+      items,
+      name,
+      orderType,
+      tableNo,
+      selectedAddress,
+      orderStatus,
+      status: 'created', // Initial status
+      paymentIntentId: paymentIntent.id, // Store payment intent ID
     });
 
     await newOrder.save();
 
-    res.json({ orderId: order.id, amount: order.amount, razorpayKey: process.env.RAZORPAY_KEY_ID });
+    res.status(200).send({
+      clientSecret: paymentIntent.client_secret,
+    });
   } catch (error) {
-    res.status(500).send('Error creating order');
+    res.status(500).send({
+      error: error.message,
+    });
   }
 };
 
-exports.verifyPayment = async (req, res) => {
-  const { paymentId, orderId, signature, userId, userEmail, amount, food } = req.body;
-
-  const generatedSignature = crypto.createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
-    .update(`${orderId}|${paymentId}`)
-    .digest('hex');
-
-  const status = generatedSignature === signature ? 'success' : 'failed';
-
-  try {
-    await Order.findOneAndUpdate(
-      { orderId },
-      {
-        paymentId,
-        status,
-      },
-      { new: true }
-    );
-
-    res.json({ verified: status === 'success' });
-  } catch (error) {
-    res.status(500).send('Error verifying payment');
-  }
+module.exports = {
+  createPaymentIntent,
 };

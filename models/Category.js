@@ -11,7 +11,7 @@ const DishSchema = new Schema({
 });
 
 const CategorySchema = new Schema({
-  id: { type: Number, required: true },
+  categoryId: { type: Number, required: true },
   name: { type: String, required: true },
   dishes: { type: [DishSchema], required: true }
 });

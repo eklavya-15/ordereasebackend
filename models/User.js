@@ -16,6 +16,9 @@ const userSchema = new mongoose.Schema({
   address: { type: [String] },
   number: { type: String },
   orders: { type: [ mongoose.Schema.Types.Mixed] },
+  selectedOption: { type: String },
+  tableNo: { type: String },
+  selectedAddress: { type: String },
 });
 
 userSchema.pre('save', async function(next) {

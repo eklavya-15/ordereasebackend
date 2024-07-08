@@ -2,13 +2,20 @@ const { Dish, Category } = require('../models/Category');
 
 const addDish = async (req, res) => {
   const { categoryId, id, name, price, image, description, nutrients } = req.body;
-
+  let categoryIdDish;
+  if(categoryId === 'Indian'){
+    categoryIdDish = 5;
+  }else if(categoryId === 'Chinese'){
+    categoryIdDish = 12;
+  }else if(categoryId === 'Italian'){
+    categoryIdDish = 15;
+  }
+  console.log(categoryIdDish);
   try {
-    const category = await Category.findById(categoryId);
+    const category = await Category.findOne({categoryId: +categoryIdDish});
     if (!category) {
       return res.status(404).json({ message: 'Category not found' });
     }
-
     const newDish = new Dish({ id, name, price, image, description, nutrients });
     category.dishes.push(newDish);
     await category.save();

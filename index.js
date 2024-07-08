@@ -20,17 +20,22 @@ app.use((req, res, next) => {
 });
 
 
-
-
 const Offer = require("./models/Offer");
 const authRoutes = require("./routes/authRoutes");
 const dishRoutes = require("./routes/dishRoutes");
 const cartRoutes = require("./routes/cartRoutes");
 const paymentRoutes = require('./routes/paymentRoutes');
+const userRoutes = require('./routes/userRoutes');
+const webhookRoutes = require('./routes/webhookRoutes');
+const orderRoutes = require('./routes/orderRoutes');
 app.use("/auth", authRoutes);
 app.use("/menu", dishRoutes);
 app.use("/cart", cartRoutes);
 app.use('/', paymentRoutes);
+app.use('/api/payment', paymentRoutes);
+app.use('/api/webhook', webhookRoutes);
+app.use('/orders', orderRoutes);
+app.use(userRoutes);
 app.use("/offers", async (req, res) => {
   try {
     const offers = await Offer.find();
@@ -39,8 +44,6 @@ app.use("/offers", async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
-
-
 
 mongoose
   .connect(process.env.MONGODB_URI, {
