@@ -9,9 +9,10 @@ const createPaymentIntent = async (req, res) => {
   try {
     const paymentIntent = await stripe.paymentIntents.create({
       amount,
-      currency:'inr',
+      currency,
       receipt_email: userEmail,
       metadata: { userId },
+      customer: name,
       description: `Order for ${food}`,
     });
 
