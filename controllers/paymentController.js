@@ -12,6 +12,7 @@ const createPaymentIntent = async (req, res) => {
       currency,
       receipt_email: userEmail,
       metadata: { userId },
+      description: `Order for ${food}`,
     });
 
     // Create a new order in the database
